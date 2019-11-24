@@ -21,12 +21,13 @@ export const muteFirst = <T, R>(first$: Observable<T>, second$: Observable<R>): 
     distinctUntilChanged()
   );
 
-export const getData = <T>(selectors: Selectors<T>, fetchData: () => Observable<T>, cancel: () => void): Observable<T> => {
+export const getData = <T>(selectors: Selectors<T>,
+                           fetchData: () => Observable<T>,
+                           cancel: () => void): Observable<T> => {
   const require$ = selectors.need$.pipe(
     filter(need => need),
     switchMap(fetchData),
     finalize(cancel),
-    switchMap(() => selectors.loaded$),
     share()
   );
   return muteFirst(require$.pipe(startWith(null)), selectors.data$);
@@ -64,6 +65,7 @@ export class FetchDataService {
   }
 
   getConfig$(): Observable<ConfigData> {
+    // this.fetchConfig();
     return getData<ConfigData>(
       this.configSelectors,
       () => this.fetchConfig(),
